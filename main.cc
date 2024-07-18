@@ -74,13 +74,26 @@ int main()
     auto plugin = edit.getPluginCache().createNewPlugin(te::FourOscPlugin::xmlTypeName, {}).get();
     auto fourOscPlugin = static_cast<te::FourOscPlugin *>(plugin);
 
-    auto plugin2 = edit.getPluginCache().createNewPlugin(te::DelayPlugin::xmlTypeName, {}).get();
-    auto delayPlugin = static_cast<te::DelayPlugin *>(plugin);
+    auto plugin2 = edit.getPluginCache().createNewPlugin(te::FourOscPlugin::xmlTypeName, {}).get();
+    auto fourOscPlugin2 = static_cast<te::FourOscPlugin *>(plugin2);
+
+    auto plugin3 = edit.getPluginCache().createNewPlugin(te::DelayPlugin::xmlTypeName, {}).get();
+    auto delayPlugin = static_cast<te::DelayPlugin *>(plugin3);
+
+    auto plugin4 = edit.getPluginCache().createNewPlugin(te::PhaserPlugin::xmlTypeName, {}).get();
+    auto phaserPlugin = static_cast<te::PhaserPlugin *>(plugin4);
                     
 
     // Insert the plugin to the track
+    // track->pluginList.insertPlugin(*fourOscPlugin, 0, nullptr);
+    // track->pluginList.insertPlugin(*delayPlugin, 1, nullptr);
+    
+    for (int i = 0; i < fourOscPlugin->oscParams.size(); i++) {
+        fourOscPlugin->oscParams[i]->waveShapeValue.setValue(2, nullptr);
+    }
     track->pluginList.insertPlugin(*fourOscPlugin, 0, nullptr);
     track->pluginList.insertPlugin(*delayPlugin, 1, nullptr);
+    track->pluginList.insertPlugin(*phaserPlugin, 2, nullptr);
 
     // Get the transport & set it to the start of the edit
     auto &transport = edit.getTransport();
