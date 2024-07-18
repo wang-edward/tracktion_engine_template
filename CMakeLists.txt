@@ -15,7 +15,7 @@ juce_add_console_app(TracktionHelloWorld
 
 target_sources(TracktionHelloWorld
     PRIVATE
-        main.cpp)
+        main.cc)
 
 target_compile_definitions(TracktionHelloWorld
     PRIVATE
