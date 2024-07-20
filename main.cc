@@ -106,6 +106,7 @@ int main()
     // track->pluginList.insertPlugin(*phaserPlugin, 2, nullptr);
 
 
+    // USE setParameter() TO CONTROL PLUGIN PARAMS!!!
     std::cout << delayPlugin->mixProportion->getCurrentValue() << std::endl;
     delayPlugin->mixProportion->setParameter(2.0, juce::dontSendNotification);
     delayPlugin->feedbackDb->setParameter(10, juce::dontSendNotification);
