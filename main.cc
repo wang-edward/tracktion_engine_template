@@ -88,12 +88,30 @@ int main()
     // track->pluginList.insertPlugin(*fourOscPlugin, 0, nullptr);
     // track->pluginList.insertPlugin(*delayPlugin, 1, nullptr);
     
-    for (int i = 0; i < fourOscPlugin->oscParams.size(); i++) {
-        fourOscPlugin->oscParams[i]->waveShapeValue.setValue(2, nullptr);
-    }
+    // for (int i = 0; i < fourOscPlugin->oscParams.size(); i++) {
+    //     fourOscPlugin->oscParams[i]->waveShapeValue.setValue(0, nullptr);
+    // }
+
+
+    fourOscPlugin->chorusOnValue.setValue(true, nullptr);
+    fourOscPlugin->chorusMixValue.setValue(1000, nullptr);
+    fourOscPlugin->distortionOnValue.setValue(true, nullptr);
+    fourOscPlugin->distortionValue.setValue(100, nullptr);
+
+    std::cout << fourOscPlugin->chorusOnValue << std::endl;
+    std::cout << fourOscPlugin->chorusMixValue << std::endl;
+
     track->pluginList.insertPlugin(*fourOscPlugin, 0, nullptr);
     track->pluginList.insertPlugin(*delayPlugin, 1, nullptr);
-    track->pluginList.insertPlugin(*phaserPlugin, 2, nullptr);
+    // track->pluginList.insertPlugin(*phaserPlugin, 2, nullptr);
+
+
+    std::cout << delayPlugin->mixProportion->getCurrentValue() << std::endl;
+    delayPlugin->mixProportion->setParameter(2.0, juce::dontSendNotification);
+    delayPlugin->feedbackDb->setParameter(10, juce::dontSendNotification);
+    delayPlugin->feedbackValue = 10;
+    std::cout << delayPlugin->feedbackValue << std::endl;
+
 
     // Get the transport & set it to the start of the edit
     auto &transport = edit.getTransport();
