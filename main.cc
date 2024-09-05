@@ -82,7 +82,7 @@ int main()
 
     auto plugin4 = edit.getPluginCache().createNewPlugin(te::PhaserPlugin::xmlTypeName, {}).get();
     auto phaserPlugin = static_cast<te::PhaserPlugin *>(plugin4);
-                    
+
 
     // Insert the plugin to the track
     // track->pluginList.insertPlugin(*fourOscPlugin, 0, nullptr);
@@ -107,11 +107,15 @@ int main()
 
 
     // USE setParameter() TO CONTROL PLUGIN PARAMS!!!
-    std::cout << delayPlugin->mixProportion->getCurrentValue() << std::endl;
+    std::cout << delayPlugin->lengthMs << std::endl;
     delayPlugin->mixProportion->setParameter(2.0, juce::dontSendNotification);
-    delayPlugin->feedbackDb->setParameter(10, juce::dontSendNotification);
-    delayPlugin->feedbackValue = 10;
+    // delayPlugin->feedbackValue = -1;
+    delayPlugin->feedbackDb->setParameter(-1, juce::dontSendNotification);
+    // delayPlugin->lengthMs = 10;
+
+    std::cout << delayPlugin->mixProportion->getCurrentValue() << std::endl;
     std::cout << delayPlugin->feedbackValue << std::endl;
+    std::cout << delayPlugin->lengthMs << std::endl;
 
 
     // Get the transport & set it to the start of the edit
