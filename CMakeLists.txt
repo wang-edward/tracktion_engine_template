@@ -1,39 +1,162 @@
-# For lots of helpful commentary on the commands used this file, look
-# at the CMakeLists.txt it was based on:
-# https://github.com/juce-framework/JUCE/blob/master/examples/CMake/ConsoleApp/CMakeLists.txt
+# # For lots of helpful commentary on the commands used this file, look
+# # at the CMakeLists.txt it was based on:
+# # https://github.com/juce-framework/JUCE/blob/master/examples/CMake/ConsoleApp/CMakeLists.txt
+
+# cmake_minimum_required(VERSION 3.22)
+
+# set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+# project(TRACKTION_HELLO_WORLD VERSION 0.0.1)
+
+# add_subdirectory(tracktion_engine/modules/juce)
+# add_subdirectory(tracktion_engine/modules)
+
+# find_package(Curses REQUIRED)
+# include_directories(${CURSES_INCLUDE_DIR})
+
+# juce_add_console_app(TracktionHelloWorld
+#     PRODUCT_NAME "Tracktion Hello World")
+
+# target_sources(TracktionHelloWorld
+#     PRIVATE
+#         main.cc)
+
+# target_compile_definitions(TracktionHelloWorld
+#     PRIVATE
+#         JUCE_WEB_BROWSER=0
+#         JUCE_USE_CURL=0)
+
+# target_link_libraries(TracktionHelloWorld
+#     PRIVATE
+#         tracktion::tracktion_engine
+#         juce::juce_core
+#     PUBLIC
+#         juce::juce_recommended_config_flags
+#         juce::juce_recommended_warning_flags
+#         ${CURSES_LIBRARIES})
+
+# if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+#   target_link_libraries(TracktionHelloWorld PRIVATE "-latomic")
+# endif()
+
+
+# _----------------------------------------------
 
 cmake_minimum_required(VERSION 3.22)
 
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-project(TRACKTION_HELLO_WORLD VERSION 0.0.1)
+set (TARGET_NAME DemoRunner)
 
-add_subdirectory(tracktion_engine/modules/juce)
-add_subdirectory(tracktion_engine/modules)
+if (DEFINED PROJECT_NAME)
+    message ("Adding ${TARGET_NAME} to the ${PROJECT_NAME} project")
+else()
+    file(READ ../../VERSION.md CURRENT_VERSION)
+    project(${TARGET_NAME} VERSION ${CURRENT_VERSION})
+    # add_subdirectory(../../modules/juce ./cmake_build_juce)
+    # add_subdirectory(../../modules ./cmake_build_tracktion)
+    add_subdirectory(tracktion_engine/modules/juce)
+    add_subdirectory(tracktion_engine/modules)
+endif()
 
-find_package(Curses REQUIRED)
-include_directories(${CURSES_INCLUDE_DIR})
+# If we are compiling for macOS we want to target OS versions down to 10.13
+if (APPLE)
+    set (CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE INTERNAL "")
+endif()
 
-juce_add_console_app(TracktionHelloWorld
-    PRODUCT_NAME "Tracktion Hello World")
+# Adds all the module sources so they appear correctly in the IDE
+set_property(GLOBAL PROPERTY USE_FOLDERS YES)
+option(JUCE_ENABLE_MODULE_SOURCE_GROUPS "Enable Module Source Groups" ON)
 
-target_sources(TracktionHelloWorld
-    PRIVATE
-        main.cc)
+# if (DEFINED ENV{VST2_SDK_DIR})
+#     MESSAGE(STATUS "Building with VST2 SDK: $ENV{VST2_SDK_DIR}")
+#     juce_set_vst2_sdk_path($ENV{VST2_SDK_DIR})
+# else()
+#     MESSAGE(STATUS "Not building with VST2")
+# endif()
 
-target_compile_definitions(TracktionHelloWorld
-    PRIVATE
-        JUCE_WEB_BROWSER=0
-        JUCE_USE_CURL=0)
+juce_add_pip (${TARGET_NAME}.h)
 
-target_link_libraries(TracktionHelloWorld
-    PRIVATE
-        tracktion::tracktion_engine
-        juce::juce_core
-    PUBLIC
-        juce::juce_recommended_config_flags
-        juce::juce_recommended_warning_flags
-        ${CURSES_LIBRARIES})
+juce_generate_juce_header(${TARGET_NAME})
+
+# juce_add_binary_data (${TARGET_NAME}BinaryData SOURCES
+#     resources/edm_song.ogg
+#     resources/drum_loop.wav
+#     resources/synth_loop.wav
+#     resources/midi_arp.mid
+#     resources/midi_arp_2.mid)
+
+target_compile_features(${TARGET_NAME} PRIVATE cxx_std_20)
+
+set_target_properties(${TARGET_NAME} PROPERTIES
+    C_VISIBILITY_PRESET hidden
+    CXX_VISIBILITY_PRESET hidden)
+
+set(SourceFiles
+    ${TARGET_NAME}.h
+    demos/AbletonLinkDemo.h
+    demos/ContainerClipDemo.h
+    demos/DistortionEffectDemo.h
+    demos/GlobalQuantiseDemo.h
+    demos/IRPluginDemo.h
+    demos/MidiRecordingDemo.h
+    demos/PatternGeneratorDemo.h
+    demos/PitchAndTimeDemo.h
+    demos/PlaybackDemo.h
+    demos/PluginDemo.h
+    demos/RecordingDemo.h
+    demos/StepSequencerDemo.h)
+
+target_sources(${TARGET_NAME} PRIVATE ${SourceFiles})
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/.. PREFIX Source FILES ${SourceFiles})
+
+include("${CMAKE_CURRENT_SOURCE_DIR}/../../tests/utils.cmake")
+addModuleSourceTarget()
+
+if (DEFINED ENV{VST2_SDK_DIR})
+    target_compile_definitions(${TARGET_NAME} PRIVATE
+        JUCE_PLUGINHOST_VST=1)
+endif()
+
+
+target_compile_definitions(${TARGET_NAME} PRIVATE
+    JUCE_PLUGINHOST_AU=1
+    JUCE_PLUGINHOST_LADSPA=1
+    JUCE_PLUGINHOST_VST3=1
+    JUCE_USE_CURL=0
+    JUCE_WEB_BROWSER=0
+    JUCE_MODAL_LOOPS_PERMITTED=1
+    JUCE_STRICT_REFCOUNTEDPOINTER=1
+    TRACKTION_ENABLE_TIMESTRETCH_SOUNDTOUCH=1)
+
+target_link_libraries(${TARGET_NAME} PRIVATE
+    tracktion::tracktion_core
+    tracktion::tracktion_engine
+    tracktion::tracktion_graph
+    juce::juce_audio_devices
+    juce::juce_audio_processors
+    juce::juce_audio_utils
+    juce::juce_recommended_warning_flags
+    ${TARGET_NAME}BinaryData)
+
+# Compile with werror in release builds
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR
+    CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+    target_compile_options(${TARGET_NAME} PRIVATE "$<$<CONFIG:Release>:-Werror>")
+elseif (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+    target_compile_options(${TARGET_NAME} PRIVATE "/W4")
+    target_compile_options(${TARGET_NAME} PRIVATE "$<$<CONFIG:Release>:/WX>")
+endif()
+
+if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+    target_compile_options(${TARGET_NAME} PRIVATE "-fno-aligned-allocation")
+endif()
+
+if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unknown-pragmas")
+endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-  target_link_libraries(TracktionHelloWorld PRIVATE "-latomic")
+  target_link_libraries(${TARGET_NAME} PRIVATE "-latomic")
+
+  if (NOT ${CMAKE_HOST_SYSTEM_PROCESSOR} MATCHES "aarch64")
+    target_link_options(${TARGET_NAME} PRIVATE "-m64")
+  endif()
 endif()
