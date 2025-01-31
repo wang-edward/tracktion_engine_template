@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 3.22)
 project(GUI_APP_EXAMPLE VERSION 0.0.1)
 
-add_subdirectory(external/tracktion_engine/modules/juce)
-add_subdirectory(external/tracktion_engine/modules)
-add_subdirectory(external/raylib)
-add_subdirectory(external/googletest)
-include_directories(include)
-include_directories(external/googletest/googletest/include)
+add_subdirectory(tracktion_engine/modules/juce)
+add_subdirectory(tracktion_engine/modules)
+# add_subdirectory(external/raylib)
+# add_subdirectory(external/googletest)
+# include_directories(include)
+# include_directories(external/googletest/googletest/include)
 
 
 # If you've installed JUCE somehow (via a package manager, or directly using the CMake install
@@ -89,6 +89,7 @@ target_link_libraries(Gui
         # GuiAppData            # If we'd created a binary data target, we'd link to it here
         juce::juce_gui_extra
     PUBLIC
+        tracktion::tracktion_engine
         juce::juce_recommended_config_flags
         juce::juce_recommended_lto_flags
         juce::juce_recommended_warning_flags)

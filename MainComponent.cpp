@@ -5,6 +5,21 @@
 MainComponent::MainComponent()
 {
     setSize (600, 400);
+    std::filesystem::path curr_path = std::filesystem::current_path();
+    juce::File my_file{juce::String{curr_path.string() + "/tmp.box"}};
+
+    edit_ = createEmptyEdit(engine_, my_file);
+
+    // test ALSA::VirtualMidi
+    {
+        std::cout << "ALSA::VirtualMidi begin" << std::endl;
+        engine_.getDeviceManager().createVirtualMidiDevice("box_midi");
+        engine_.getDeviceManager().setDefaultMidiInDevice("box_midi");
+        auto ptr = engine.getDeviceManager().getDefaultMidiInDevice();
+        assert(ptr != nullptr);
+        std::cout << "ALSA::VirtualMidi end" << std::endl;
+    }
+
     // InitWindow(512, 512, "JuceApp");
 }
 
