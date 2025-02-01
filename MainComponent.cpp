@@ -1,5 +1,6 @@
 #include "MainComponent.h"
 // #include <raylib.h>
+#include <iostream>
 
 //==============================================================================
 MainComponent::MainComponent()
@@ -15,7 +16,7 @@ MainComponent::MainComponent()
         std::cout << "ALSA::VirtualMidi begin" << std::endl;
         engine_.getDeviceManager().createVirtualMidiDevice("box_midi");
         engine_.getDeviceManager().setDefaultMidiInDevice("box_midi");
-        auto ptr = engine.getDeviceManager().getDefaultMidiInDevice();
+        auto ptr = engine_.getDeviceManager().getDefaultMidiInDevice();
         assert(ptr != nullptr);
         std::cout << "ALSA::VirtualMidi end" << std::endl;
     }
