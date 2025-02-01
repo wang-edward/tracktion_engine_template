@@ -1,6 +1,7 @@
 #include "MainComponent.h"
 // #include <raylib.h>
 #include <iostream>
+#include <chrono>
 
 //==============================================================================
 MainComponent::MainComponent()
@@ -10,6 +11,8 @@ MainComponent::MainComponent()
     juce::File my_file{juce::String{curr_path.string() + "/tmp.box"}};
 
     edit_ = createEmptyEdit(engine_, my_file);
+
+    std::this_thread::sleep_for(std::chrono::seconds(5));
 
     // test ALSA::VirtualMidi
     {
