@@ -22,12 +22,14 @@ public:
 
     //==============================================================================
     void paint (juce::Graphics&) override;
+    void test();
     void resized() override;
 
 private:
     //==============================================================================
     // Your private member variables go here...
 
+    int n_ = 0;
     te::Engine engine_{"Tracktion Hello World"};
     std::unique_ptr<te::Edit> edit_;
 

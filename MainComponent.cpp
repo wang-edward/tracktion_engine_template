@@ -12,18 +12,6 @@ MainComponent::MainComponent()
 
     edit_ = createEmptyEdit(engine_, my_file);
 
-    std::this_thread::sleep_for(std::chrono::seconds(5));
-
-    // test ALSA::VirtualMidi
-    {
-        std::cout << "ALSA::VirtualMidi begin" << std::endl;
-        engine_.getDeviceManager().createVirtualMidiDevice("box_midi");
-        engine_.getDeviceManager().setDefaultMidiInDevice("box_midi");
-        auto ptr = engine_.getDeviceManager().getDefaultMidiInDevice();
-        assert(ptr != nullptr);
-        std::cout << "ALSA::VirtualMidi end" << std::endl;
-    }
-
     // InitWindow(512, 512, "JuceApp");
 }
 
@@ -36,6 +24,30 @@ void MainComponent::paint (juce::Graphics& g)
     // g.setFont (juce::FontOptions (16.0f));
     // g.setColour (juce::Colours::white);
     // g.drawText ("Hello World!", getLocalBounds(), juce::Justification::centred, true);
+    test();
+}
+
+void MainComponent::test()
+{
+    // weird way to induce a wait
+    while (true) {
+        if (n_ < 1e7)
+        {
+            n_ += 1;
+            // std::cout << "n_: " << n_ << std::endl;
+        }
+        else
+        {
+            // test ALSA::VirtualMidi
+            std::cout << "ALSA::VirtualMidi begin" << std::endl;
+            engine_.getDeviceManager().createVirtualMidiDevice("box_midi");
+            engine_.getDeviceManager().setDefaultMidiInDevice("box_midi");
+            auto ptr = engine_.getDeviceManager().getDefaultMidiInDevice();
+            assert(ptr != nullptr);
+            std::cout << "ALSA::VirtualMidi end" << std::endl;
+            exit(0);
+        }
+    }
 }
 
 void MainComponent::resized()
